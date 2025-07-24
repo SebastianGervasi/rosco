@@ -952,6 +952,365 @@
                 color: #666;
             }
         }
+
+        /* Diseño móvil completamente rediseñado */
+        @media (max-width: 768px) {
+            body {
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .container {
+                padding: 5px;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .game-screen {
+                padding: 10px;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .game-header {
+                flex-shrink: 0;
+                margin-bottom: 10px;
+                padding: 5px 0;
+                border-bottom: none;
+            }
+
+            .player-info h2 {
+                font-size: 1.2em;
+                margin-bottom: 2px;
+            }
+
+            .player-info p {
+                font-size: 0.8em;
+                color: #666;
+            }
+
+            .timer {
+                font-size: 1.5em;
+                padding: 8px 15px;
+                margin: 0;
+            }
+
+            .game-controls {
+                gap: 5px;
+            }
+
+            .control-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-height: 35px;
+            }
+
+            .game-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                overflow: hidden;
+            }
+
+            /* Rosco arriba y más pequeño */
+            .rosco-container {
+                width: 220px;
+                height: 220px;
+                margin: 0 auto;
+                flex-shrink: 0;
+                order: 1;
+            }
+
+            .rosco {
+                border: 4px solid #333;
+            }
+
+            .letter {
+                width: 24px;
+                height: 24px;
+                font-size: 11px;
+                font-weight: bold;
+                border: 2px solid #333;
+            }
+
+            .letter.current {
+                transform: scale(1.2);
+            }
+
+            .rosco-center {
+                width: 100px;
+                height: 100px;
+                padding: 8px;
+                border: 2px solid #333;
+            }
+
+            .question-text {
+                font-size: 10px;
+                line-height: 1.2;
+                font-weight: 700;
+            }
+
+            /* Panel de control abajo y compacto */
+            .host-panel {
+                order: 2;
+                padding: 10px;
+                margin: 0;
+                flex-shrink: 0;
+                border: 2px solid #007bff;
+            }
+
+            .host-panel h3 {
+                font-size: 1em;
+                margin-bottom: 8px;
+            }
+
+            .current-letter-display {
+                margin-bottom: 10px;
+            }
+
+            .current-letter-display .letter-big {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8em;
+                margin-bottom: 5px;
+            }
+
+            .current-letter-display p {
+                font-size: 0.8em;
+                margin: 0;
+            }
+
+            .answer-display {
+                padding: 8px;
+                margin-bottom: 10px;
+            }
+
+            .answer-display h4 {
+                font-size: 0.9em;
+                margin-bottom: 5px;
+            }
+
+            .correct-answer {
+                font-size: 1.1em;
+                padding: 6px;
+            }
+
+            .question-type {
+                font-size: 10px;
+                padding: 4px 8px;
+                margin-bottom: 5px;
+            }
+
+            .host-controls {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .host-btn {
+                padding: 12px;
+                font-size: 14px;
+                min-height: 45px;
+                border-radius: 8px;
+            }
+
+            .stats {
+                gap: 5px;
+                margin-top: 8px;
+            }
+
+            .stat {
+                padding: 6px 4px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+            }
+
+            .player-info h2 {
+                font-size: 1em;
+            }
+
+            .player-info p {
+                font-size: 0.7em;
+            }
+
+            .timer {
+                font-size: 1.3em;
+                padding: 6px 12px;
+            }
+
+            .rosco-container {
+                width: 200px;
+                height: 200px;
+            }
+
+            .letter {
+                width: 22px;
+                height: 22px;
+                font-size: 10px;
+            }
+
+            .rosco-center {
+                width: 90px;
+                height: 90px;
+                padding: 6px;
+            }
+
+            .question-text {
+                font-size: 9px;
+                line-height: 1.1;
+            }
+
+            .current-letter-display .letter-big {
+                width: 45px;
+                height: 45px;
+                font-size: 1.6em;
+            }
+
+            .correct-answer {
+                font-size: 1em;
+                padding: 5px;
+            }
+
+            .host-btn {
+                padding: 10px;
+                font-size: 13px;
+                min-height: 40px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .rosco-container {
+                width: 180px;
+                height: 180px;
+            }
+
+            .letter {
+                width: 20px;
+                height: 20px;
+                font-size: 9px;
+            }
+
+            .rosco-center {
+                width: 80px;
+                height: 80px;
+                padding: 5px;
+            }
+
+            .question-text {
+                font-size: 8px;
+                line-height: 1.0;
+            }
+
+            .current-letter-display .letter-big {
+                width: 40px;
+                height: 40px;
+                font-size: 1.4em;
+            }
+
+            .host-btn {
+                padding: 8px;
+                font-size: 12px;
+                min-height: 38px;
+            }
+
+            .timer {
+                font-size: 1.1em;
+                padding: 5px 10px;
+            }
+        }
+
+        /* Optimizaciones para touch */
+        @media (hover: none) and (pointer: coarse) {
+            .host-btn:hover,
+            .control-btn:hover,
+            .start-btn:hover,
+            .resume-btn:hover,
+            .play-again-btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .host-btn:active,
+            .control-btn:active,
+            .start-btn:active,
+            .resume-btn:active,
+            .play-again-btn:active {
+                transform: scale(0.98);
+                transition: transform 0.1s;
+            }
+        }
+
+        /* Mejorar la visibilidad del texto en general */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Asegurar que el contenido no se desborde en móviles */
+        .container {
+            overflow-x: hidden;
+        }
+
+        /* Mejorar la tabla de resultados en móviles */
+        @media (max-width: 768px) {
+            .results-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .results-table thead,
+            .results-table tbody,
+            .results-table th,
+            .results-table td,
+            .results-table tr {
+                display: block;
+            }
+
+            .results-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            .results-table tr {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 8px;
+                background: white;
+            }
+
+            .results-table td {
+                border: none;
+                position: relative;
+                padding: 8px 8px 8px 25%;
+                white-space: normal;
+                text-align: left;
+            }
+
+            .results-table td:before {
+                content: attr(data-label) ": ";
+                position: absolute;
+                left: 6px;
+                width: 20%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: #666;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1407,19 +1766,27 @@
             });
         }
 
-        // Crear el rosco visual
+        // Crear el rosco visual con mejor centrado
         function createRosco() {
             const rosco = document.getElementById('rosco');
-            const centerX = 200;
-            const centerY = 200;
-            const radius = 150;
+            rosco.innerHTML = ''; // Limpiar contenido previo
+            
+            const container = rosco.parentElement;
+            const containerWidth = container.offsetWidth;
+            const containerHeight = container.offsetHeight;
+            const centerX = containerWidth / 2;
+            const centerY = containerHeight / 2;
+            
+            // Ajustar radio según el tamaño del contenedor
+            const radius = Math.min(containerWidth, containerHeight) * 0.35;
 
             letters.forEach((letter, index) => {
                 const angle = (index * 360 / letters.length) - 90; // -90 para empezar arriba
                 const radian = (angle * Math.PI) / 180;
                 
-                const x = centerX + radius * Math.cos(radian) - 25; // -25 para centrar
-                const y = centerY + radius * Math.sin(radian) - 25;
+                const letterSize = window.innerWidth <= 480 ? 22 : (window.innerWidth <= 768 ? 24 : 50);
+                const x = centerX + radius * Math.cos(radian) - (letterSize / 2);
+                const y = centerY + radius * Math.sin(radian) - (letterSize / 2);
 
                 const letterElement = document.createElement('div');
                 letterElement.className = 'letter';
@@ -1441,9 +1808,21 @@
             document.getElementById('resumeBtn').addEventListener('click', resumeGame);
             document.getElementById('pauseBtn').addEventListener('click', togglePause);
             document.getElementById('restartBtn').addEventListener('click', restartGame);
+
+            window.addEventListener('resize', () => {
+                if (gameState.gameStarted && !gameState.gameEnded) {
+                    setTimeout(createRosco, 100);
+                }
+            });
+
+            window.addEventListener('orientationchange', () => {
+                if (gameState.gameStarted && !gameState.gameEnded) {
+                    setTimeout(createRosco, 300);
+                }
+            });
         }
 
-        // Iniciar cuenta regresiva
+        // Iniciar cuenta regresiva más rápida
         function startCountdown() {
             gameConfig.playerName = document.getElementById('playerName').value;
             gameConfig.gameTime = parseInt(document.getElementById('gameTime').value);
@@ -1451,14 +1830,14 @@
             setupScreen.style.display = 'none';
             countdownScreen.style.display = 'block';
             
-            let count = 3;
+            let count = 3; // Cambiar a 3
             const countdownNumber = document.getElementById('countdownNumber');
             
             const countdownInterval = setInterval(() => {
                 countdownNumber.textContent = count;
                 countdownNumber.style.animation = 'none';
                 setTimeout(() => {
-                    countdownNumber.style.animation = 'countdownPulse 0.8s ease-in-out';
+                    countdownNumber.style.animation = 'countdownPulse 0.6s ease-in-out';
                 }, 10);
                 
                 count--;
@@ -1467,7 +1846,7 @@
                     clearInterval(countdownInterval);
                     startGame();
                 }
-            }, 800);
+            }, 600); // Más rápido: 600ms por número
         }
 
         // Iniciar juego
