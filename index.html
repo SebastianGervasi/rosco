@@ -1451,14 +1451,14 @@
             setupScreen.style.display = 'none';
             countdownScreen.style.display = 'block';
             
-            let count = 5;
+            let count = 3;
             const countdownNumber = document.getElementById('countdownNumber');
             
             const countdownInterval = setInterval(() => {
                 countdownNumber.textContent = count;
                 countdownNumber.style.animation = 'none';
                 setTimeout(() => {
-                    countdownNumber.style.animation = 'countdownPulse 1s ease-in-out';
+                    countdownNumber.style.animation = 'countdownPulse 0.8s ease-in-out';
                 }, 10);
                 
                 count--;
@@ -1467,7 +1467,7 @@
                     clearInterval(countdownInterval);
                     startGame();
                 }
-            }, 1000);
+            }, 800);
         }
 
         // Iniciar juego
