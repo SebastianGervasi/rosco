@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosco de Pasapalabra - Modo Anfitrión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Pantalla de configuración */
+        .setup-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .setup-screen h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .setup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Pantalla de cuenta regresiva */
+        .countdown-screen {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .countdown-number {
+            font-size: 8em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            animation: countdownPulse 1s ease-in-out;
+        }
+
+        @keyframes countdownPulse {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .countdown-text {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Pantalla de juego */
+        .game-screen {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .player-info h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .timer {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #e74c3c;
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 3px solid #e74c3c;
+        }
+
+        .timer.warning {
+            animation: pulse 1s infinite;
+        }
+
+        .timer.paused {
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pause-btn {
+            background: #ffc107;
+            color: #333;
+            border: 2px solid #f39c12;
+        }
+
+        .restart-btn {
+            background: #6c757d;
+            color: white;
+            border: 2px solid #545b62;
+            display: none;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .game-content {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Rosco circular */
+        .rosco-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+        }
+
+        .rosco {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            background: #f8f9fa;
+            border: 8px solid #333;
+        }
+
+        .letter {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e9ecef;
+            border: 3px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .letter.current {
+            background: #007bff;
+            color: white;
+            border-color: #0056b3;
+            transform: scale(1.3);
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+        }
+
+        .letter.correct {
+            background: #28a745;
+            color: white;
+            border-color: #1e7e34;
+        }
+
+        .letter.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #c82333;
+        }
+
+        .letter.pasapalabra {
+            background: #ffc107;
+            color: #333;
+            border-color: #f39c12;
+        }
+
+        /* Centro del rosco */
+        .rosco-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: white;
+            border-radius: 50%;
+            border: 4px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Panel de control del anfitrión */
+        .host-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #007bff;
+        }
+
+        .host-panel h3 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        .current-letter-display {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .current-letter-display .letter-big {
+            font-size: 3em;
+            font-weight: bold;
+            color: white;
+            background: #007bff;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            border: 3px solid #0056b3;
+        }
+
+        .answer-display {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 2px solid #2196f3;
+        }
+
+        .answer-display h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .correct-answer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1976d2;
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #2196f3;
+        }
+
+        .question-type {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            border: 1px solid #ffc107;
+        }
+
+        .host-controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .host-btn {
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .host-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .host-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-correct {
+            background: #28a745;
+            color: white;
+            border: 3px solid #1e7e34;
+        }
+
+        .btn-incorrect {
+            background: #dc3545;
+            color: white;
+            border: 3px solid #c82333;
+        }
+
+        .btn-pasapalabra {
+            background: #ffc107;
+            color: #333;
+            border: 3px solid #f39c12;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .stat {
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .stat.correct { 
+            background: #d4edda; 
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .stat.incorrect { 
+            background: #f8d7da; 
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .stat.pasapalabra { 
+            background: #fff3cd; 
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
+        /* Modal de pausa */
+        .pause-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pause-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            margin: 20px;
+        }
+
+        .pause-content h2 {
+            color: #dc3545;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .wrong-answer {
+            font-size: 1.5em;
+            color: #dc3545;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8d7da;
+            border-radius: 10px;
+            border: 2px solid #dc3545;
+        }
+
+        .resume-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Pantalla de resultados */
+        .results-screen {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .final-stat {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            border: 3px solid;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .results-table tr.correct { background: #d4edda; }
+        .results-table tr.incorrect { background: #f8d7da; }
+        .results-table tr.pasapalabra { background: #fff3cd; }
+
+        .question-type-cell {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .play-again-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .game-content {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .rosco-container {
+                width: 320px;
+                height: 320px;
+                order: 2;
+            }
+
+            .host-panel {
+                order: 1;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .letter {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+                font-weight: bold;
+            }
+
+            .rosco-center {
+                width: 180px;
+                height: 180px;
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 14px;
+                line-height: 1.4;
+                font-weight: 600;
+            }
+
+            .game-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .timer {
+                font-size: 2.2em;
+                padding: 12px 20px;
+            }
+
+            .countdown-number {
+                font-size: 6em;
+            }
+
+            .host-btn {
+                padding: 20px;
+                font-size: 18px;
+                min-height: 60px;
+            }
+
+            .control-btn {
+                padding: 15px 25px;
+                font-size: 18px;
+                min-height: 50px;
+            }
+
+            .current-letter-display .letter-big {
+                width: 90px;
+                height: 90px;
+                font-size: 3.5em;
+            }
+
+            .correct-answer {
+                font-size: 1.8em;
+                padding: 15px;
+            }
+
+            .question-type {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .setup-screen,
+            .game-screen,
+            .results-screen,
+            .countdown-screen {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .setup-screen {
+                max-width: 100%;
+            }
+
+            .rosco-container {
+                width: 280px;
+                height: 280px;
+            }
+
+            .letter {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .letter.current {
+                transform: scale(1.4);
+            }
+
+            .rosco-center {
+                width: 140px;
+                height: 140px;
+                padding: 15px;
+            }
+
+            .question-text {
+                font-size: 12px;
+                line-height: 1.3;
+                font-weight: 600;
+            }
+
+            .host-controls {
+                gap: 12px;
+            }
+
+            .host-btn {
+                padding: 18px;
+                font-size: 16px;
+                min-height: 55px;
+                border-radius: 12px;
+            }
+
+            .control-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+                min-height: 45px;
+            }
+
+            .countdown-number {
+                font-size: 4.5em;
+            }
+
+            .timer {
+                font-size: 1.8em;
+                padding: 10px 18px;
+            }
+
+            .current-letter-display .letter-big {
+                width: 75px;
+                height: 75px;
+                font-size: 2.8em;
+            }
+
+            .correct-answer {
+                font-size: 1.5em;
+                padding: 12px;
+            }
+
+            .question-type {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .input-group input {
+                padding: 15px;
+                font-size: 18px;
+                border-radius: 10px;
+            }
+
+            .start-btn {
+                padding: 18px 35px;
+                font-size: 20px;
+                border-radius: 12px;
+                min-height: 55px;
+            }
+
+            .setup-screen h1 {
+                font-size: 2em;
+            }
+
+            .results-table {
+                font-size: 14px;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 8px 6px;
+            }
+
+            .final-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .final-stat {
+                padding: 15px 10px;
+            }
+
+            .pause-content {
+                padding: 25px 20px;
+                margin: 15px;
+            }
+
+            .wrong-answer {
+                font-size: 1.3em;
+                padding: 12px;
+            }
+
+            .resume-btn {
+                padding: 15px 25px;
+                font-size: 16px;
+                min-height: 50px;
+            }
+        }
+
+        /* Mejoras específicas para móviles */
+        @media (max-width: 768px) {
+            /* Hacer los botones más grandes y fáciles de tocar */
+            button {
+                min-height: 48px;
+                touch-action: manipulation;
+            }
+
+            /* Mejorar el espaciado en móviles */
+            .game-header {
+                padding-bottom: 20px;
+                border-bottom: 2px solid #eee;
+            }
+
+            /* Hacer el rosco más accesible en móviles */
+            .rosco-container {
+                margin: 20px auto;
+            }
+
+            /* Mejorar la legibilidad del panel del anfitrión */
+            .host-panel h3 {
+                font-size: 1.3em;
+                margin-bottom: 15px;
+            }
+
+            .answer-display {
+                margin-bottom: 20px;
+            }
+
+            .stats {
+                margin-top: 20px;
+                gap: 12px;
+            }
+
+            .stat {
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+        }
+
+        /* Estilos adicionales para pantallas muy pequeñas */
+        @media (max-width: 360px) {
+            .rosco-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .letter {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .rosco-center {
+                width: 120px;
+                height: 120px;
+                padding: 12px;
+            }
+
+            .question-text {
+                font-size: 11px;
+                line-height: 1.2;
+            }
+
+            .host-btn {
+                padding: 15px;
+                font-size: 15px;
+                min-height: 50px;
+            }
+
+            .current-letter-display .letter-big {
+                width: 65px;
+                height: 65px;
+                font-size: 2.3em;
+            }
+
+            .correct-answer {
+                font-size: 1.3em;
+                padding: 10px;
+            }
+        }
+
+        /* Optimizaciones para touch */
+        @media (hover: none) and (pointer: coarse) {
+            .host-btn:hover,
+            .control-btn:hover,
+            .start-btn:hover,
+            .resume-btn:hover,
+            .play-again-btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .host-btn:active,
+            .control-btn:active,
+            .start-btn:active,
+            .resume-btn:active,
+            .play-again-btn:active {
+                transform: scale(0.98);
+                transition: transform 0.1s;
+            }
+        }
+
+        /* Mejorar la visibilidad del texto en general */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Asegurar que el contenido no se desborde en móviles */
+        .container {
+            overflow-x: hidden;
+        }
+
+        /* Mejorar la tabla de resultados en móviles */
+        @media (max-width: 768px) {
+            .results-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .results-table thead,
+            .results-table tbody,
+            .results-table th,
+            .results-table td,
+            .results-table tr {
+                display: block;
+            }
+
+            .results-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            .results-table tr {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 8px;
+                background: white;
+            }
+
+            .results-table td {
+                border: none;
+                position: relative;
+                padding: 8px 8px 8px 25%;
+                white-space: normal;
+                text-align: left;
+            }
+
+            .results-table td:before {
+                content: attr(data-label) ": ";
+                position: absolute;
+                left: 6px;
+                width: 20%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Pantalla de configuración -->
+        <div class="setup-screen" id="setupScreen">
+            <h1>🎯 Rosco de Pasapalabra</h1>
+            <h3 style="color: #666; margin-bottom: 30px;">Modo Anfitrión</h3>
+            <form class="setup-form" id="setupForm">
+                <div class="input-group">
+                    <label for="playerName">Nombre del jugador:</label>
+                    <input type="text" id="playerName" required placeholder="Ingresa el nombre del jugador">
+                </div>
+                
+                <div class="input-group">
+                    <label for="gameTime">Tiempo de juego (segundos):</label>
+                    <input type="number" id="gameTime" value="90" min="30" max="300" required>
+                </div>
+
+                <button type="submit" class="start-btn">¡Comenzar Juego!</button>
+            </form>
+        </div>
+
+        <!-- Pantalla de cuenta regresiva -->
+        <div class="countdown-screen" id="countdownScreen">
+            <div class="countdown-text">El juego comenzará en...</div>
+            <div class="countdown-number" id="countdownNumber">5</div>
+            <div style="color: #666;">¡Prepárate!</div>
+        </div>
+
+        <!-- Pantalla de juego -->
+        <div class="game-screen" id="gameScreen">
+            <div class="game-header">
+                <div class="player-info">
+                    <h2 id="playerNameDisplay"></h2>
+                    <p>Rosco de Pasapalabra - Modo Anfitrión</p>
+                </div>
+                <div class="game-controls">
+                    <button class="control-btn pause-btn" id="pauseBtn">⏸ PAUSA</button>
+                    <button class="control-btn restart-btn" id="restartBtn">🔄 REINICIAR</button>
+                </div>
+                <div class="timer" id="timer">90</div>
+            </div>
+
+            <div class="game-content">
+                <div class="rosco-container">
+                    <div class="rosco" id="rosco">
+                        <!-- Las letras se generarán dinámicamente -->
+                    </div>
+                    <div class="rosco-center">
+                        <div class="question-text" id="questionText">
+                            ¡El juego comenzará en breve!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="host-panel">
+                    <h3>🎤 Panel del Anfitrión</h3>
+                    
+                    <div class="current-letter-display">
+                        <div class="letter-big" id="currentLetterBig">A</div>
+                        <p><strong>Letra actual</strong></p>
+                    </div>
+
+                    <div class="answer-display">
+                        <div class="question-type" id="questionType">Empieza por la letra</div>
+                        <h4>Respuesta correcta:</h4>
+                        <div class="correct-answer" id="correctAnswer">-</div>
+                    </div>
+
+                    <div class="host-controls">
+                        <button class="host-btn btn-correct" id="correctBtn" disabled>✓ CORRECTA</button>
+                        <button class="host-btn btn-incorrect" id="incorrectBtn" disabled>✗ INCORRECTA</button>
+                        <button class="host-btn btn-pasapalabra" id="pasapalabraBtn" disabled>⏭ PASAPALABRA</button>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat correct">
+                            <div>Correctas</div>
+                            <div id="correctCount">0</div>
+                        </div>
+                        <div class="stat incorrect">
+                            <div>Incorrectas</div>
+                            <div id="incorrectCount">0</div>
+                        </div>
+                        <div class="stat pasapalabra">
+                            <div>Pasapalabra</div>
+                            <div id="pasapalabraCount">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de pausa por respuesta incorrecta -->
+        <div class="pause-modal" id="pauseModal">
+            <div class="pause-content">
+                <h2>❌ Respuesta Incorrecta</h2>
+                <p>La respuesta correcta era:</p>
+                <div class="wrong-answer" id="wrongAnswerDisplay"></div>
+                <button class="resume-btn" id="resumeBtn">Continuar con la siguiente letra</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de resultados -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-header">
+                <h1>🏁 ¡JUEGO FINALIZADO!</h1>
+                <h2 id="finalPlayerName"></h2>
+            </div>
+
+            <div class="final-stats">
+                <div class="final-stat correct" style="border-color: #28a745;">
+                    <h3 id="finalCorrect">0</h3>
+                    <p>Correctas</p>
+                </div>
+                <div class="final-stat incorrect" style="border-color: #dc3545;">
+                    <h3 id="finalIncorrect">0</h3>
+                    <p>Incorrectas</p>
+                </div>
+                <div class="final-stat pasapalabra" style="border-color: #ffc107;">
+                    <h3 id="finalPasapalabra">0</h3>
+                    <p>Pasapalabra</p>
+                </div>
+                <div class="final-stat" style="background: #e3f2fd; color: #0d47a1; border-color: #2196f3;">
+                    <h3 id="finalTime">0</h3>
+                    <p>Tiempo usado</p>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Letra</th>
+                            <th>Tipo</th>
+                            <th>Pregunta</th>
+                            <th>Respuesta Correcta</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <!-- Se llenará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="play-again-btn" onclick="location.reload()">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración del juego
+        let gameConfig = {
+            playerName: '',
+            gameTime: 90
+        };
+
+        // Estado del juego
+        let gameState = {
+            currentLetter: 0,
+            timeLeft: 90,
+            timer: null,
+            gameStarted: false,
+            gameEnded: false,
+            gamePaused: false,
+            stats: { correct: 0, incorrect: 0, pasapalabra: 0 },
+            answers: {},
+            usedQuestions: new Set() // Para evitar repetir preguntas
+        };
+
+        // Banco completo de preguntas del rosco con múltiples opciones por letra
+        const questionBank = {
+            'A': [
+                { type: 'starts', question: 'A: Vehículo de motor con cuatro ruedas para el transporte de personas', answer: 'AUTO' },
+                { type: 'starts', question: 'A: Líquido transparente e incoloro que bebemos', answer: 'AGUA' },
+                { type: 'starts', question: 'A: Ave rapaz de gran tamaño que vuela muy alto', answer: 'AGUILA' },
+                { type: 'starts', question: 'A: Fruto del manzano, generalmente de color rojo o verde', answer: 'MANZANA' },
+                { type: 'contains', question: 'Contiene A: Instrumento musical de cuerda que se toca con los dedos', answer: 'GUITARRA' },
+                { type: 'contains', question: 'Contiene A: Deporte que se juega en una cancha con una pelota naranja', answer: 'BASQUET' },
+                { type: 'contains', question: 'Contiene A: Animal doméstico que ladra', answer: 'PERRO' }
+            ],
+            'B': [
+                { type: 'starts', question: 'B: Embarcación de estructura cóncava y, generalmente, de grandes dimensiones', answer: 'BARCO' },
+                { type: 'starts', question: 'B: Fruto amarillo alargado que comen los monos', answer: 'BANANA' },
+                { type: 'starts', question: 'B: Deporte que se juega con una pelota naranja y dos canastas', answer: 'BASQUET' },
+                { type: 'starts', question: 'B: Lugar donde se guardan y prestan libros', answer: 'BIBLIOTECA' },
+                { type: 'contains', question: 'Contiene B: Conjunto de muchas hojas de papel encuadernadas', answer: 'LIBRO' },
+                { type: 'contains', question: 'Contiene B: Mueble donde se duerme', answer: 'CAMA' },
+                { type: 'contains', question: 'Contiene B: Prenda de vestir que cubre el torso', answer: 'CAMISA' }
+            ],
+            'C': [
+                { type: 'starts', question: 'C: Animal doméstico felino que maúlla', answer: 'GATO' },
+                { type: 'starts', question: 'C: Vehículo de cuatro ruedas movido por motor', answer: 'COCHE' },
+                { type: 'starts', question: 'C: Edificio donde vive una familia', answer: 'CASA' },
+                { type: 'starts', question: 'C: Órgano que bombea sangre en nuestro cuerpo', answer: 'CORAZON' },
+                { type: 'contains', question: 'Contiene C: Instrumento para escribir con tinta', answer: 'LAPICERO' },
+                { type: 'contains', question: 'Contiene C: Deporte que se juega con los pies', answer: 'FUTBOL' },
+                { type: 'contains', question: 'Contiene C: Aparato para hacer fotografías', answer: 'CAMARA' }
+            ],
+            'D': [
+                { type: 'starts', question: 'D: Cada una de las extremidades que tienen los humanos en la boca para masticar', answer: 'DIENTE' },
+                { type: 'starts', question: 'D: Moneda de curso legal', answer: 'DINERO' },
+                { type: 'starts', question: 'D: Período de veinticuatro horas', answer: 'DIA' },
+                { type: 'starts', question: 'D: Instrumento musical de percusión con parches', answer: 'TAMBOR' },
+                { type: 'contains', question: 'Contiene D: Lugar donde se estudia', answer: 'ESCUELA' },
+                { type: 'contains', question: 'Contiene D: Aparato para escuchar música', answer: 'RADIO' },
+                { type: 'contains', question: 'Contiene D: Juego de mesa con fichas numeradas', answer: 'DOMINO' }
+            ],
+            'E': [
+                { type: 'starts', question: 'E: Animal mamífero con trompa muy larga', answer: 'ELEFANTE' },
+                { type: 'starts', question: 'E: Lugar donde se enseña y se aprende', answer: 'ESCUELA' },
+                { type: 'starts', question: 'E: Construcción que tiene varios pisos', answer: 'EDIFICIO' },
+                { type: 'starts', question: 'E: Astro que nos da luz y calor', answer: 'SOL' },
+                { type: 'contains', question: 'Contiene E: Aparato para subir y bajar entre pisos', answer: 'ASCENSOR' },
+                { type: 'contains', question: 'Contiene E: Vehículo de dos ruedas', answer: 'BICICLETA' },
+                { type: 'contains', question: 'Contiene E: Deporte que se juega con raqueta', answer: 'TENIS' }
+            ],
+            'F': [
+                { type: 'starts', question: 'F: Deporte que se juega con los pies y una pelota redonda', answer: 'FUTBOL' },
+                { type: 'starts', question: 'F: Conjunto de personas que viven juntas', answer: 'FAMILIA' },
+                { type: 'starts', question: 'F: Elemento químico que produce llama', answer: 'FUEGO' },
+                { type: 'starts', question: 'F: Recipiente de vidrio para contener líquidos', answer: 'BOTELLA' },
+                { type: 'contains', question: 'Contiene F: Aparato para hablar a distancia', answer: 'TELEFONO' },
+                { type: 'contains', question: 'Contiene F: Profesión que apaga incendios', answer: 'BOMBERO' },
+                { type: 'contains', question: 'Contiene F: Lugar donde se hacen películas', answer: 'ESTUDIO' }
+            ],
+            'G': [
+                { type: 'starts', question: 'G: Animal doméstico felino que maúlla', answer: 'GATO' },
+                { type: 'starts', question: 'G: Prenda de vestir para las manos', answer: 'GUANTE' },
+                { type: 'starts', question: 'G: Conflicto armado entre países', answer: 'GUERRA' },
+                { type: 'starts', question: 'G: Instrumento musical de cuerda', answer: 'GUITARRA' },
+                { type: 'contains', question: 'Contiene G: Juego de mesa con fichas blancas y negras', answer: 'AJEDREZ' },
+                { type: 'contains', question: 'Contiene G: Lugar donde se guardan los coches', answer: 'GARAJE' },
+                { type: 'contains', question: 'Contiene G: Deporte que se juega con palos y una pelota pequeña', answer: 'GOLF' }
+            ],
+            'H': [
+                { type: 'starts', question: 'H: Órgano que bombea sangre en nuestro cuerpo', answer: 'CORAZON' },
+                { type: 'starts', question: 'H: Lugar donde se atiende a los enfermos', answer: 'HOSPITAL' },
+                { type: 'starts', question: 'H: Edificio donde se alojan los viajeros', answer: 'HOTEL' },
+                { type: 'starts', question: 'H: Persona de sexo masculino', answer: 'HOMBRE' },
+                { type: 'contains', question: 'Contiene H: Vehículo de dos ruedas', answer: 'BICICLETA' },
+                { type: 'contains', question: 'Contiene H: Lugar donde se vive', answer: 'HOGAR' },
+                { type: 'contains', question: 'Contiene H: Utensilio para comer sopa', answer: 'CUCHARA' }
+            ],
+            'I': [
+                { type: 'starts', question: 'I: País europeo con forma de bota', answer: 'ITALIA' },
+                { type: 'starts', question: 'I: Lengua que se habla en un país', answer: 'IDIOMA' },
+                { type: 'starts', question: 'I: Lugar donde se reza', answer: 'IGLESIA' },
+                { type: 'starts', question: 'I: Estación del año más fría', answer: 'INVIERNO' },
+                { type: 'contains', question: 'Contiene I: Aparato para planchar ropa', answer: 'PLANCHA' },
+                { type: 'contains', question: 'Contiene I: Deporte que se juega en el agua', answer: 'NATACION' },
+                { type: 'contains', question: 'Contiene I: Lugar donde se hacen películas', answer: 'CINE' }
+            ],
+            'J': [
+                { type: 'starts', question: 'J: Piedra preciosa de color verde', answer: 'JADE' },
+                { type: 'starts', question: 'J: Actividad recreativa con reglas', answer: 'JUEGO' },
+                { type: 'starts', question: 'J: Día de la semana antes del viernes', answer: 'JUEVES' },
+                { type: 'starts', question: 'J: Recipiente para contener agua', answer: 'JARRA' },
+                { type: 'contains', question: 'Contiene J: Lugar donde se imparte justicia', answer: 'JUZGADO' },
+                { type: 'contains', question: 'Contiene J: Persona que trabaja en una oficina', answer: 'EJECUTIVO' },
+                { type: 'contains', question: 'Contiene J: Insecto que produce miel', answer: 'ABEJA' }
+            ],
+            'K': [
+                { type: 'starts', question: 'K: Arte marcial japonés', answer: 'KARATE' },
+                { type: 'starts', question: 'K: Unidad de peso equivalente a mil gramos', answer: 'KILO' },
+                { type: 'starts', question: 'K: Fruto seco de color verde', answer: 'KIWI' },
+                { type: 'starts', question: 'K: Prenda tradicional japonesa', answer: 'KIMONO' },
+                { type: 'contains', question: 'Contiene K: Deporte que se practica en el agua', answer: 'KAYAK' },
+                { type: 'contains', question: 'Contiene K: Bebida alcohólica rusa', answer: 'VODKA' },
+                { type: 'contains', question: 'Contiene K: Lugar donde se prepara la comida', answer: 'COCINA' }
+            ],
+            'L': [
+                { type: 'starts', question: 'L: Satélite natural de la Tierra', answer: 'LUNA' },
+                { type: 'starts', question: 'L: Conjunto de muchas hojas de papel encuadernadas', answer: 'LIBRO' },
+                { type: 'starts', question: 'L: Instrumento para escribir', answer: 'LAPIZ' },
+                { type: 'starts', question: 'L: Lugar donde se trabaja', answer: 'LABORATORIO' },
+                { type: 'contains', question: 'Contiene L: Aparato para dar luz', answer: 'LAMPARA' },
+                { type: 'contains', question: 'Contiene L: Deporte que se juega con una pelota', answer: 'VOLEIBOL' },
+                { type: 'contains', question: 'Contiene L: Vehículo que vuela', answer: 'HELICOPTERO' }
+            ],
+            'M': [
+                { type: 'starts', question: 'M: Fruto amarillo alargado que comen los monos', answer: 'BANANA' },
+                { type: 'starts', question: 'M: Aparato para hacer música', answer: 'MUSICA' },
+                { type: 'starts', question: 'M: Lugar donde se venden productos', answer: 'MERCADO' },
+                { type: 'starts', question: 'M: Persona que enseña', answer: 'MAESTRO' },
+                { type: 'contains', question: 'Contiene M: Aparato para ver programas', answer: 'TELEVISION' },
+                { type: 'contains', question: 'Contiene M: Lugar donde se guardan los libros', answer: 'BIBLIOTECA' },
+                { type: 'contains', question: 'Contiene M: Deporte de combate', answer: 'BOXEO' }
+            ],
+            'N': [
+                { type: 'starts', question: 'N: Punto cardinal opuesto al sur', answer: 'NORTE' },
+                { type: 'starts', question: 'N: Embarcación que navega por el mar', answer: 'NAVE' },
+                { type: 'starts', question: 'N: Período de oscuridad', answer: 'NOCHE' },
+                { type: 'starts', question: 'N: Persona recién nacida', answer: 'NIÑO' },
+                { type: 'contains', question: 'Contiene N: Aparato para hacer ejercicio', answer: 'BICICLETA' },
+                { type: 'contains', question: 'Contiene N: Lugar donde se duerme', answer: 'DORMITORIO' },
+                { type: 'contains', question: 'Contiene N: Deporte acuático', answer: 'NATACION' }
+            ],
+            'O': [
+                { type: 'starts', question: 'O: Metal precioso de color amarillo', answer: 'ORO' },
+                { type: 'starts', question: 'O: Órgano de la vista', answer: 'OJO' },
+                { type: 'starts', question: 'O: Mamífero grande de color negro y blanco', answer: 'OSO' },
+                { type: 'starts', question: 'O: Estación del año entre verano e invierno', answer: 'OTOÑO' },
+                { type: 'contains', question: 'Contiene O: Aparato para escuchar música', answer: 'RADIO' },
+                { type: 'contains', question: 'Contiene O: Deporte que se juega con los pies', answer: 'FUTBOL' },
+                { type: 'contains', question: 'Contiene O: Lugar donde se trabaja', answer: 'OFICINA' }
+            ],
+            'P': [
+                { type: 'starts', question: 'P: Ave que no puede volar y vive en el polo sur', answer: 'PINGUINO' },
+                { type: 'starts', question: 'P: Fruta de color amarillo con corona verde', answer: 'PIÑA' },
+                { type: 'starts', question: 'P: Lugar donde se hacen las compras', answer: 'PLAZA' },
+                { type: 'starts', question: 'P: Utensilio para escribir', answer: 'PLUMA' },
+                { type: 'contains', question: 'Contiene P: Aparato para hacer fotografías', answer: 'CAMARA' },
+                { type: 'contains', question: 'Contiene P: Deporte acuático', answer: 'WATERPOLO' },
+                { type: 'contains', question: 'Contiene P: Lugar donde se estudia', answer: 'ESCUELA' }
+            ],
+            'Q': [
+                { type: 'starts', question: 'Q: Producto lácteo que se hace con leche', answer: 'QUESO' },
+                { type: 'starts', question: 'Q: Acción de amar', answer: 'QUERER' },
+                { type: 'starts', question: 'Q: Sustancia que produce fuego', answer: 'QUEROSENO' },
+                { type: 'starts', question: 'Q: Sonido que hacen algunos pájaros', answer: 'QUEJIDO' },
+                { type: 'contains', question: 'Contiene Q: Deporte que se juega con raqueta', answer: 'SQUASH' },
+                { type: 'contains', question: 'Contiene Q: Lugar donde se hacen experimentos', answer: 'LABORATORIO' },
+                { type: 'contains', question: 'Contiene Q: Aparato para hacer música', answer: 'ORQUESTA' }
+            ],
+            'R': [
+                { type: 'starts', question: 'R: Color que resulta de mezclar blanco y rojo', answer: 'ROSA' },
+                { type: 'starts', question: 'R: Aparato para escuchar música y noticias', answer: 'RADIO' },
+                { type: 'starts', question: 'R: Curso de agua que desemboca en el mar', answer: 'RIO' },
+                { type: 'starts', question: 'R: Prenda de vestir que cubre el cuerpo', answer: 'ROPA' },
+                { type: 'contains', question: 'Contiene R: Vehículo de cuatro ruedas', answer: 'CARRO' },
+                { type: 'contains', question: 'Contiene R: Lugar donde se guardan los libros', answer: 'LIBRERIA' },
+                { type: 'contains', question: 'Contiene R: Deporte que se juega con una pelota', answer: 'FUTBOL' }
+            ],
+            'S': [
+                { type: 'starts', question: 'S: Estrella que nos da luz y calor', answer: 'SOL' },
+                { type: 'starts', question: 'S: Mueble para sentarse', answer: 'SILLA' },
+                { type: 'starts', question: 'S: Día de la semana después del viernes', answer: 'SABADO' },
+                { type: 'starts', question: 'S: Lugar donde se duerme', answer: 'SOFA' },
+                { type: 'contains', question: 'Contiene S: Lugar donde se estudia', answer: 'ESCUELA' },
+                { type: 'contains', question: 'Contiene S: Deporte que se juega con una pelota', answer: 'BASQUET' },
+                { type: 'contains', question: 'Contiene S: Aparato para ver programas', answer: 'TELEVISION' }
+            ],
+            'T': [
+                { type: 'starts', question: 'T: Reptil con caparazón', answer: 'TORTUGA' },
+                { type: 'starts', question: 'T: Aparato para hablar a distancia', answer: 'TELEFONO' },
+                { type: 'starts', question: 'T: Mueble donde se come', answer: 'MESA' },
+                { type: 'starts', question: 'T: Período de tiempo', answer: 'TIEMPO' },
+                { type: 'contains', question: 'Contiene T: Deporte que se juega con raqueta', answer: 'TENIS' },
+                { type: 'contains', question: 'Contiene T: Aparato para ver programas', answer: 'TELEVISION' },
+                { type: 'contains', question: 'Contiene T: Lugar donde se trabaja', answer: 'OFICINA' }
+            ],
+            'U': [
+                { type: 'starts', question: 'U: Fruto morado que crece en racimos', answer: 'UVA' },
+                { type: 'starts', question: 'U: Lugar donde se estudia después del colegio', answer: 'UNIVERSIDAD' },
+                { type: 'starts', question: 'U: Instrumento para comer', answer: 'UTENSILIO' },
+                { type: 'starts', question: 'U: Cada una de las extremidades de las manos', answer: 'UÑA' },
+                { type: 'contains', question: 'Contiene U: Deporte acuático', answer: 'SURF' },
+                { type: 'contains', question: 'Contiene U: Lugar donde se hacen las compras', answer: 'SUPERMERCADO' },
+                { type: 'contains', question: 'Contiene U: Aparato para hacer música', answer: 'GUITARRA' }
+            ],
+            'V': [
+                { type: 'starts', question: 'V: Medio de transporte que vuela', answer: 'AVION' },
+                { type: 'starts', question: 'V: Recipiente para contener líquidos', answer: 'VASO' },
+                { type: 'starts', question: 'V: Estación del año más calurosa', answer: 'VERANO' },
+                { type: 'starts', question: 'V: Color que resulta de mezclar azul y rojo', answer: 'VIOLETA' },
+                { type: 'contains', question: 'Contiene V: Aparato para ver programas', answer: 'TELEVISION' },
+                { type: 'contains', question: 'Contiene V: Deporte que se juega con una pelota', answer: 'VOLEIBOL' },
+                { type: 'contains', question: 'Contiene V: Lugar donde se vive', answer: 'VIVIENDA' }
+            ],
+            'W': [
+                { type: 'starts', question: 'W: Red mundial de información', answer: 'WEB' },
+                { type: 'starts', question: 'W: Bebida alcohólica escocesa', answer: 'WHISKY' },
+                { type: 'starts', question: 'W: Sistema operativo de Microsoft', answer: 'WINDOWS' },
+                { type: 'starts', question: 'W: Deporte acuático con tabla', answer: 'WINDSURF' },
+                { type: 'contains', question: 'Contiene W: Deporte de lucha', answer: 'WRESTLING' },
+                { type: 'contains', question: 'Contiene W: Lugar de trabajo', answer: 'WORKSHOP' },
+                { type: 'contains', question: 'Contiene W: Red social', answer: 'TWITTER' }
+            ],
+            'X': [
+                { type: 'starts', question: 'X: Instrumento musical de percusión con láminas', answer: 'XILOFONO' },
+                { type: 'starts', question: 'X: Copia de un documento', answer: 'XEROCOPIA' },
+                { type: 'starts', question: 'X: Gas noble', answer: 'XENON' },
+                { type: 'starts', question: 'X: Planta de jardín', answer: 'XEROFITA' },
+                { type: 'contains', question: 'Contiene X: Deporte de combate', answer: 'BOXEO' },
+                { type: 'contains', question: 'Contiene X: Aparato para hacer ejercicio', answer: 'FLEXIONES' },
+                { type: 'contains', question: 'Contiene X: Número romano', answer: 'SEIS' }
+            ],
+            'Y': [
+                { type: 'starts', question: 'Y: Embarcación de recreo', answer: 'YATE' },
+                { type: 'starts', question: 'Y: Hierba medicinal', answer: 'YERBA' },
+                { type: 'starts', question: 'Y: Huevo de ave', answer: 'YEMA' },
+                { type: 'starts', question: 'Y: Arte marcial', answer: 'YOGA' },
+                { type: 'contains', question: 'Contiene Y: Deporte que se juega con una pelota', answer: 'RUGBY' },
+                { type: 'contains', question: 'Contiene Y: Lugar donde se hacen experimentos', answer: 'LABORATORIO' },
+                { type: 'contains', question: 'Contiene Y: Aparato para hacer ejercicio', answer: 'BICICLETA' }
+            ],
+            'Z': [
+                { type: 'starts', question: 'Z: Animal rayado parecido al caballo', answer: 'ZEBRA' },
+                { type: 'starts', question: 'Z: Calzado que cubre el pie', answer: 'ZAPATO' },
+                { type: 'starts', question: 'Z: Lugar donde se exhiben animales', answer: 'ZOO' },
+                { type: 'starts', question: 'Z: Verdura de color naranja', answer: 'ZANAHORIA' },
+                { type: 'contains', question: 'Contiene Z: Lugar donde se hacen las compras', answer: 'PLAZA' },
+                { type: 'contains', question: 'Contiene Z: Deporte que se practica en el agua', answer: 'NATACION' },
+                { type: 'contains', question: 'Contiene Z: Aparato para hacer música', answer: 'JAZZ' }
+            ]
+        };
+
+        // Letras del rosco (sin Ñ)
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+        // Elementos del DOM
+        const setupScreen = document.getElementById('setupScreen');
+        const countdownScreen = document.getElementById('countdownScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const pauseModal = document.getElementById('pauseModal');
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSetup();
+            createRosco();
+            setupEventListeners();
+        });
+
+        // Función para seleccionar pregunta aleatoria para cada letra
+        function selectRandomQuestion(letter) {
+            const availableQuestions = questionBank[letter].filter(q => 
+                !gameState.usedQuestions.has(`${letter}-${q.answer}`)
+            );
+            
+            if (availableQuestions.length === 0) {
+                // Si no hay preguntas disponibles, usar cualquiera
+                const randomIndex = Math.floor(Math.random() * questionBank[letter].length);
+                return questionBank[letter][randomIndex];
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            const selectedQuestion = availableQuestions[randomIndex];
+            
+            // Marcar como usada
+            gameState.usedQuestions.add(`${letter}-${selectedQuestion.answer}`);
+            
+            return selectedQuestion;
+        }
+
+        // Configuración inicial
+        function initializeSetup() {
+            document.getElementById('setupForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                startCountdown();
+            });
+        }
+
+        // Crear el rosco visual
+        function createRosco() {
+            const rosco = document.getElementById('rosco');
+            const centerX = 200;
+            const centerY = 200;
+            const radius = 150;
+
+            letters.forEach((letter, index) => {
+                const angle = (index * 360 / letters.length) - 90; // -90 para empezar arriba
+                const radian = (angle * Math.PI) / 180;
+                
+                const x = centerX + radius * Math.cos(radian) - 25; // -25 para centrar
+                const y = centerY + radius * Math.sin(radian) - 25;
+
+                const letterElement = document.createElement('div');
+                letterElement.className = 'letter';
+                letterElement.textContent = letter;
+                letterElement.style.left = x + 'px';
+                letterElement.style.top = y + 'px';
+                letterElement.dataset.letter = letter;
+                letterElement.dataset.index = index;
+
+                rosco.appendChild(letterElement);
+            });
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            document.getElementById('correctBtn').addEventListener('click', () => markAnswer('correct'));
+            document.getElementById('incorrectBtn').addEventListener('click', () => markAnswer('incorrect'));
+            document.getElementById('pasapalabraBtn').addEventListener('click', () => markAnswer('pasapalabra'));
+            document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+            document.getElementById('pauseBtn').addEventListener('click', togglePause);
+            document.getElementById('restartBtn').addEventListener('click', restartGame);
+        }
+
+        // Iniciar cuenta regresiva
+        function startCountdown() {
+            gameConfig.playerName = document.getElementById('playerName').value;
+            gameConfig.gameTime = parseInt(document.getElementById('gameTime').value);
+            
+            setupScreen.style.display = 'none';
+            countdownScreen.style.display = 'block';
+            
+            let count = 5;
+            const countdownNumber = document.getElementById('countdownNumber');
+            
+            const countdownInterval = setInterval(() => {
+                countdownNumber.textContent = count;
+                countdownNumber.style.animation = 'none';
+                setTimeout(() => {
+                    countdownNumber.style.animation = 'countdownPulse 1s ease-in-out';
+                }, 10);
+                
+                count--;
+                
+                if (count < 0) {
+                    clearInterval(countdownInterval);
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        // Iniciar juego
+        function startGame() {
+            gameState.timeLeft = gameConfig.gameTime;
+            gameState.currentLetter = 0;
+            gameState.gameStarted = true;
+            gameState.gameEnded = false;
+            gameState.gamePaused = false;
+            gameState.stats = { correct: 0, incorrect: 0, pasapalabra: 0 };
+            gameState.answers = {};
+            gameState.usedQuestions = new Set();
+
+            // Inicializar respuestas con preguntas aleatorias
+            letters.forEach(letter => {
+                const selectedQuestion = selectRandomQuestion(letter);
+                gameState.answers[letter] = {
+                    question: selectedQuestion.question,
+                    correctAnswer: selectedQuestion.answer,
+                    type: selectedQuestion.type,
+                    status: 'pending'
+                };
+            });
+
+            // Mostrar pantalla de juego
+            countdownScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+
+            // Configurar interfaz
+            document.getElementById('playerNameDisplay').textContent = gameConfig.playerName;
+            document.getElementById('timer').textContent = gameState.timeLeft;
+            
+            // Habilitar controles
+            enableHostControls();
+            
+            // Mostrar primera pregunta
+            showCurrentQuestion();
+            
+            // Iniciar cronómetro
+            startTimer();
+        }
+
+        // Mostrar pregunta actual
+        function showCurrentQuestion() {
+            const currentLetter = letters[gameState.currentLetter];
+            const questionData = gameState.answers[currentLetter];
+            
+            // Actualizar rosco visual
+            updateRoscoDisplay();
+            
+            // Mostrar pregunta
+            document.getElementById('questionText').textContent = questionData.question;
+            document.getElementById('currentLetterBig').textContent = currentLetter;
+            document.getElementById('correctAnswer').textContent = questionData.correctAnswer;
+            
+            // Mostrar tipo de pregunta
+            const questionTypeElement = document.getElementById('questionType');
+            questionTypeElement.textContent = questionData.type === 'starts' ? 
+                'Empieza por la letra' : 'Contiene la letra';
+        }
+
+        // Actualizar display del rosco
+        function updateRoscoDisplay() {
+            const letterElements = document.querySelectorAll('.letter');
+            letterElements.forEach((element, index) => {
+                const letter = letters[index];
+                const status = gameState.answers[letter].status;
+                
+                // Remover todas las clases de estado
+                element.classList.remove('current', 'correct', 'incorrect', 'pasapalabra');
+                
+                // Agregar clase según estado
+                if (index === gameState.currentLetter && !gameState.gameEnded) {
+                    element.classList.add('current');
+                } else if (status === 'correct') {
+                    element.classList.add('correct');
+                } else if (status === 'incorrect') {
+                    element.classList.add('incorrect');
+                } else if (status === 'pasapalabra') {
+                    element.classList.add('pasapalabra');
+                }
+            });
+        }
+
+        // Marcar respuesta
+        function markAnswer(type) {
+            if (gameState.gameEnded || gameState.gamePaused) return;
+
+            const currentLetter = letters[gameState.currentLetter];
+            gameState.answers[currentLetter].status = type;
+            gameState.stats[type]++;
+
+            updateStats();
+
+            if (type === 'incorrect') {
+                // Pausar juego y mostrar modal
+                pauseGameForIncorrect(currentLetter);
+            } else {
+                // Continuar con siguiente pregunta
+                nextQuestion();
+            }
+        }
+
+        // Pausar juego por respuesta incorrecta
+        function pauseGameForIncorrect(letter) {
+            gameState.gamePaused = true;
+            disableHostControls();
+            
+            // Mostrar modal con respuesta correcta
+            document.getElementById('wrongAnswerDisplay').textContent = gameState.answers[letter].correctAnswer;
+            pauseModal.style.display = 'flex';
+            
+            // Actualizar rosco
+            updateRoscoDisplay();
+        }
+
+        // Reanudar juego
+        function resumeGame() {
+            gameState.gamePaused = false;
+            pauseModal.style.display = 'none';
+            enableHostControls();
+            nextQuestion();
+        }
+
+        // Toggle pausa manual
+        function togglePause() {
+            if (gameState.gameEnded) return;
+            
+            gameState.gamePaused = !gameState.gamePaused;
+            const pauseBtn = document.getElementById('pauseBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            const timer = document.getElementById('timer');
+            
+            if (gameState.gamePaused) {
+                pauseBtn.textContent = '▶ REANUDAR';
+                restartBtn.style.display = 'block';
+                timer.classList.add('paused');
+                disableHostControls();
+            } else {
+                pauseBtn.textContent = '⏸ PAUSA';
+                restartBtn.style.display = 'none';
+                timer.classList.remove('paused');
+                enableHostControls();
+            }
+        }
+
+        // Reiniciar rosco
+        function restartGame() {
+            if (confirm('¿Estás seguro de que quieres reiniciar el rosco? Se generarán nuevas preguntas.')) {
+                // Resetear estado del juego
+                gameState.currentLetter = 0;
+                gameState.gamePaused = false;
+                gameState.stats = { correct: 0, incorrect: 0, pasapalabra: 0 };
+                gameState.usedQuestions = new Set();
+                
+                // Generar nuevas preguntas aleatorias
+                letters.forEach(letter => {
+                    const selectedQuestion = selectRandomQuestion(letter);
+                    gameState.answers[letter] = {
+                        question: selectedQuestion.question,
+                        correctAnswer: selectedQuestion.answer,
+                        type: selectedQuestion.type,
+                        status: 'pending'
+                    };
+                });
+                
+                // Actualizar interfaz
+                updateStats();
+                showCurrentQuestion();
+                
+                // Reanudar controles
+                const pauseBtn = document.getElementById('pauseBtn');
+                const restartBtn = document.getElementById('restartBtn');
+                const timer = document.getElementById('timer');
+                
+                pauseBtn.textContent = '⏸ PAUSA';
+                restartBtn.style.display = 'none';
+                timer.classList.remove('paused');
+                enableHostControls();
+            }
+        }
+
+        // Siguiente pregunta
+        function nextQuestion() {
+            // Buscar siguiente pregunta pendiente
+            let nextIndex = -1;
+            for (let i = 0; i < letters.length; i++) {
+                const checkIndex = (gameState.currentLetter + 1 + i) % letters.length;
+                const letter = letters[checkIndex];
+                if (gameState.answers[letter].status === 'pending') {
+                    nextIndex = checkIndex;
+                    break;
+                }
+            }
+
+            if (nextIndex === -1) {
+                // No hay más preguntas pendientes
+                endGame();
+                return;
+            }
+
+            gameState.currentLetter = nextIndex;
+            showCurrentQuestion();
+        }
+
+        // Habilitar controles del anfitrión
+        function enableHostControls() {
+            document.getElementById('correctBtn').disabled = false;
+            document.getElementById('incorrectBtn').disabled = false;
+            document.getElementById('pasapalabraBtn').disabled = false;
+        }
+
+        // Deshabilitar controles del anfitrión
+        function disableHostControls() {
+            document.getElementById('correctBtn').disabled = true;
+            document.getElementById('incorrectBtn').disabled = true;
+            document.getElementById('pasapalabraBtn').disabled = true;
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            document.getElementById('correctCount').textContent = gameState.stats.correct;
+            document.getElementById('incorrectCount').textContent = gameState.stats.incorrect;
+            document.getElementById('pasapalabraCount').textContent = gameState.stats.pasapalabra;
+        }
+
+        // Iniciar cronómetro
+        function startTimer() {
+            gameState.timer = setInterval(() => {
+                if (!gameState.gamePaused) {
+                    gameState.timeLeft--;
+                    const timerElement = document.getElementById('timer');
+                    timerElement.textContent = gameState.timeLeft;
+                    
+                    // Agregar efecto de advertencia cuando quedan 10 segundos
+                    if (gameState.timeLeft <= 10) {
+                        timerElement.classList.add('warning');
+                    }
+                    
+                    if (gameState.timeLeft <= 0) {
+                        endGame();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Terminar juego
+        function endGame() {
+            if (gameState.gameEnded) return;
+            
+            gameState.gameEnded = true;
+            gameState.gamePaused = false;
+            clearInterval(gameState.timer);
+            disableHostControls();
+            
+            // Cerrar modal si está abierto
+            pauseModal.style.display = 'none';
+            
+            // Ocultar botones de control
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('restartBtn').style.display = 'none';
+            
+            // Actualizar rosco final
+            updateRoscoDisplay();
+            
+            // Mostrar alerta
+            alert('🏁 JUEGO FINALIZADO');
+            
+            // Mostrar resultados
+            setTimeout(() => {
+                showResults();
+            }, 500);
+        }
+
+        // Mostrar resultados
+        function showResults() {
+            gameScreen.style.display = 'none';
+            resultsScreen.style.display = 'block';
+            
+            // Información del jugador
+            document.getElementById('finalPlayerName').textContent = gameConfig.playerName;
+            
+            // Estadísticas finales
+            document.getElementById('finalCorrect').textContent = gameState.stats.correct;
+            document.getElementById('finalIncorrect').textContent = gameState.stats.incorrect;
+            document.getElementById('finalPasapalabra').textContent = gameState.stats.pasapalabra;
+            
+            const timeUsed = gameConfig.gameTime - gameState.timeLeft;
+            document.getElementById('finalTime').textContent = timeUsed + 's';
+            
+            // Tabla de resultados
+            const tableBody = document.getElementById('resultsTableBody');
+            tableBody.innerHTML = '';
+            
+            letters.forEach(letter => {
+                const answer = gameState.answers[letter];
+                const row = document.createElement('tr');
+                row.className = answer.status;
+                
+                const statusText = {
+                    'correct': 'Correcta ✓',
+                    'incorrect': 'Incorrecta ✗',
+                    'pasapalabra': 'Pasapalabra ⏭',
+                    'pending': 'Sin responder'
+                };
+
+                const typeText = answer.type === 'starts' ? 'Empieza por' : 'Contiene';
+                
+                row.innerHTML = `
+                    <td><strong>${letter}</strong></td>
+                    <td class="question-type-cell">${typeText}</td>
+                    <td>${answer.question}</td>
+                    <td><strong>${answer.correctAnswer}</strong></td>
+                    <td>${statusText[answer.status]}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
